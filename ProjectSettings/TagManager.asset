@@ -11,6 +11,7 @@ TagManager:
   - lava
   - Key
   - LockedDoor
+  - spawn
   layers:
   - Default
   - TransparentFX

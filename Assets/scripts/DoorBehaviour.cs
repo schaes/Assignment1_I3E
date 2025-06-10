@@ -17,5 +17,20 @@ public class DoorBehaviour : MonoBehaviour
         }
         transform.eulerAngles = doorRotation; // Apply the rotation to the door
     }
+    public Transform player; // Reference to the player transform
+
+    [SerializeField]
+    public float closeDistance = 5f; 
+
+    void Update()
+    {
+        Vector3 doorRotation = transform.eulerAngles;
+
+        if (Mathf.Approximately(doorRotation.y, 90f) && Vector3.Distance(transform.position, player.position) > closeDistance)
+        {
+            doorRotation.y = 0f; // Reset the door rotation to 0 degrees
+            transform.eulerAngles = doorRotation; // Apply the rotation to the door
+        }
+    }
 
 }

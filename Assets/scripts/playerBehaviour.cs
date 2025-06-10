@@ -1,13 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
+using UnityEngine.UI;
+using StarterAssets;
 
 public class PlayerBehaviour : MonoBehaviour
 {
     int score = 0;
     int playerHealth = 10;
-    int playerMaxHealth = 10;
     bool canInteract = false;
     public bool Key = false;
+    public Transform respawnPoint;
+    int collected = 0; // Number of collectibles collected
+    int collectibleCount;
 
     coinBehaviour currentCoin;
     DoorBehaviour currentDoor;
@@ -18,12 +23,33 @@ public class PlayerBehaviour : MonoBehaviour
 
     [SerializeField]
     float InteractionDistance = 5f;
+    [SerializeField]
+    TextMeshProUGUI scoreText;
+    [SerializeField]
+    TextMeshProUGUI healthText;
+    [SerializeField]
+    TextMeshProUGUI collectibleText;
 
-        void Update()
+
+    void Start()
+    {
+        collectibleCount = GameObject.FindGameObjectsWithTag("Collectible").Length;
+        scoreText.text = "Score: " + score.ToString();
+        healthText.text = "Health: " + playerHealth.ToString();
+        collectibleText.text = "Collected: " + collected.ToString() + "/" + collectibleCount.ToString();
+
+    }
+
+    // Call this method to set the player's position to a specific point in the map
+    public void SetPlayerPosition(Vector3 newPosition)
+    {
+        transform.position = newPosition;
+    }
+
+    void Update()
     {
         RaycastHit hitInfo;
         Debug.DrawRay(spawnPoint.position, spawnPoint.forward * InteractionDistance, Color.red);
-
 
         if (Physics.Raycast(spawnPoint.position, spawnPoint.forward, out hitInfo, InteractionDistance))
         {
@@ -40,9 +66,15 @@ public class PlayerBehaviour : MonoBehaviour
                 currentDoor = hitInfo.collider.GetComponent<DoorBehaviour>();
             }
         }
-        else if (currentCoin != null)
+        else if (currentDoor != null)
         {
-            currentCoin = null;
+            currentDoor = null;
+            canInteract = false;
+        }
+        else if (currentImportantObject != null)
+        {
+            currentImportantObject.Unhighlight(); // Unhighlight the key if not in range
+            currentImportantObject = null;
             canInteract = false;
         }
     }
@@ -57,21 +89,39 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 currentCoin.Collect(this);
                 currentCoin = null; // Reset current coin after collection
+                collected++;
+                collectibleText.text = "Collected: " + collected.ToString() + "/" + collectibleCount.ToString();
             }
         }
-
+        else if (collision.gameObject.CompareTag("spawn"))
+        {
+            respawnPoint.position = gameObject.transform.position; //set new respawn point to new spawn point
+            Debug.Log("New respawn point set to: " + respawnPoint.position);
+        }
 
         else if (collision.gameObject.CompareTag("hazard"))
         {
             if (playerHealth > 0)
             {
                 --playerHealth;
-                Debug.Log("Player damaged! Player Health: " + playerHealth);
-            }
+                healthText.text = "Health: " + playerHealth.ToString();
 
-            else if (playerHealth <= 0)
-            {
-                Debug.Log("Game Over!");
+                if (playerHealth <= 0)
+                {
+                    Debug.Log("Player health reached 0!");
+                    // Reset player health and position
+                    playerHealth = 10;
+                    healthText.text = "Health: " + playerHealth.ToString();
+                    score = score - 10;
+                    scoreText.text = "Score: " + score.ToString();
+                    var controller = GetComponent<CharacterController>();
+                    if (controller != null)
+                    {
+                        controller.enabled = false;
+                        transform.position = respawnPoint.position;
+                        controller.enabled = true;
+                    }
+                }
             }
         }
 
@@ -82,17 +132,31 @@ public class PlayerBehaviour : MonoBehaviour
         if (other.gameObject.CompareTag("lava"))
         {
             playerHealth = 0; // Set player health to 0 when entering lava
-            Debug.Log("Player entered lava! Game Over!");
+            Debug.Log("Player entered lava!");
+            playerHealth = 10;
+            healthText.text = "Health: " + playerHealth.ToString();
+            score = score - 10;
+            scoreText.text = "Score: " + score.ToString();
+            var controller = GetComponent<CharacterController>();
+            if (controller != null)
+            {
+                controller.enabled = false;
+                transform.position = respawnPoint.position;
+                controller.enabled = true;
+            }
+
+
+                
         }
     }
-    
-    
+
+
     public void ModifyScore(int amount)
     {
         score += amount;
-        Debug.Log("Score: " + score);
+        scoreText.text = "Score: " + score.ToString();
     }
-        public void KeyCollected()
+    public void KeyCollected()
     {
         Key = true;
         Debug.Log("Key collected!");
@@ -146,7 +210,7 @@ public class PlayerBehaviour : MonoBehaviour
         {
             Debug.Log("Nothing to interact with!");
         }
-        
+
     }
 
     void OnTriggerExit(Collider other)
@@ -157,4 +221,6 @@ public class PlayerBehaviour : MonoBehaviour
             canInteract = false;
         }
     }
+
+
 }
