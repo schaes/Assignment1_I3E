@@ -1,10 +1,9 @@
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
-public class coinBehaviour : MonoBehaviour
+public class ImportantObjectBehaviour : MonoBehaviour
 {
-    [SerializeField]
-    int value = 10;
 
     MeshRenderer myMeshRenderer;
     [SerializeField]
@@ -20,8 +19,17 @@ public class coinBehaviour : MonoBehaviour
 
     public void Collect(PlayerBehaviour player)
     {
-        player.ModifyScore(value);
+        player.KeyCollected();
         Destroy(gameObject);
+    }
+
+    public void Highlight()
+    {
+        myMeshRenderer.material = highlightColor;
+    }
+    public void Unhighlight()
+    {
+        myMeshRenderer.material = originalColor;
     }
 
     void Update()
@@ -29,4 +37,5 @@ public class coinBehaviour : MonoBehaviour
         this.transform.Rotate(Vector3.up, 100 * Time.deltaTime, Space.World);
     }
 }
+
 

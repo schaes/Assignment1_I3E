@@ -7,6 +7,10 @@ TagManager:
   - CinemachineTarget
   - hazard
   - door
+  - Collectible
+  - lava
+  - Key
+  - LockedDoor
   layers:
   - Default
   - TransparentFX

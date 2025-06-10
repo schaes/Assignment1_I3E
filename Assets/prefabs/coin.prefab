@@ -125,6 +125,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   value: 10
+  highlightColor: {fileID: 2100000, guid: 3f6554e5ac3dac545a418144ba3fe2f7, type: 2}
+  originalColor: {fileID: 2100000, guid: 0d36a041b6e08a64198d7cc03f9edcef, type: 2}
 --- !u!54 &4729664160517531858
 Rigidbody:
   m_ObjectHideFlags: 0
