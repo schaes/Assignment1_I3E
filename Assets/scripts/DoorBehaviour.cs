@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class DoorBehaviour : MonoBehaviour
 {
+    [SerializeField]
+    bool willItLock;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void Interact()
     {
@@ -25,11 +27,13 @@ public class DoorBehaviour : MonoBehaviour
     void Update()
     {
         Vector3 doorRotation = transform.eulerAngles;
-
-        if (Mathf.Approximately(doorRotation.y, 90f) && Vector3.Distance(transform.position, player.position) > closeDistance)
-        {
-            doorRotation.y = 0f; // Reset the door rotation to 0 degrees
-            transform.eulerAngles = doorRotation; // Apply the rotation to the door
+        if (willItLock)
+        { 
+            if (Mathf.Approximately(doorRotation.y, 90f) && Vector3.Distance(transform.position, player.position) > closeDistance)
+            {
+                doorRotation.y = 0f; // Reset the door rotation to 0 degrees
+                transform.eulerAngles = doorRotation; // Apply the rotation to the door
+            } 
         }
     }
 

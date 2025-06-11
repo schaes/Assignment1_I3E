@@ -12,6 +12,7 @@ TagManager:
   - Key
   - LockedDoor
   - spawn
+  - Win
   layers:
   - Default
   - TransparentFX

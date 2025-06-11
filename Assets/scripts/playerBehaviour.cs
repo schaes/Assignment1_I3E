@@ -3,14 +3,17 @@ using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.UI;
 using StarterAssets;
+using UnityEngine.ProBuilder.Shapes;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+    public bool Key = false;
+    public Transform respawnPoint;
+    public GameObject WinText;
+    public GameObject NotificationText;
     int score = 0;
     int playerHealth = 10;
     bool canInteract = false;
-    public bool Key = false;
-    public Transform respawnPoint;
     int collected = 0; // Number of collectibles collected
     int collectibleCount;
 
@@ -29,10 +32,18 @@ public class PlayerBehaviour : MonoBehaviour
     TextMeshProUGUI healthText;
     [SerializeField]
     TextMeshProUGUI collectibleText;
+    [SerializeField]
+    TextMeshProUGUI FinalScoreText;
+    [SerializeField]
+    TextMeshProUGUI FinalCollectibleText;
+    [SerializeField]
+    TextMeshProUGUI DescriptionText;
 
 
     void Start()
     {
+        WinText.gameObject.SetActive(false);
+        NotificationText.gameObject.SetActive(false);
         collectibleCount = GameObject.FindGameObjectsWithTag("Collectible").Length;
         scoreText.text = "Score: " + score.ToString();
         healthText.text = "Health: " + playerHealth.ToString();
@@ -58,24 +69,41 @@ public class PlayerBehaviour : MonoBehaviour
                 canInteract = true;
                 currentImportantObject = hitInfo.collider.GetComponent<ImportantObjectBehaviour>();
                 currentImportantObject.Highlight(); //Highlights the key
-
+                NotificationText.gameObject.SetActive(true);
+                DescriptionText.text = "Press E to Interact"; 
             }
-            else if (hitInfo.collider.CompareTag("door") || hitInfo.collider.CompareTag("LockedDoor"))
+            else if (hitInfo.collider.CompareTag("door"))
             {
                 canInteract = true;
                 currentDoor = hitInfo.collider.GetComponent<DoorBehaviour>();
+                NotificationText.gameObject.SetActive(true);
+                DescriptionText.text = "Press E to Interact"; 
+            }
+            else if (hitInfo.collider.CompareTag("LockedDoor"))
+            {
+                canInteract = true;
+                currentDoor = hitInfo.collider.GetComponent<DoorBehaviour>();
+                NotificationText.gameObject.SetActive(true);
+                if (Key)
+                {
+                    DescriptionText.text = "Press E to unlock";
+                }
+                else
+                    DescriptionText.text = "This door is Locked!";
             }
         }
         else if (currentDoor != null)
         {
             currentDoor = null;
             canInteract = false;
+            NotificationText.gameObject.SetActive(false);
         }
         else if (currentImportantObject != null)
         {
             currentImportantObject.Unhighlight(); // Unhighlight the key if not in range
             currentImportantObject = null;
             canInteract = false;
+            NotificationText.gameObject.SetActive(false);
         }
     }
 
@@ -144,9 +172,13 @@ public class PlayerBehaviour : MonoBehaviour
                 transform.position = respawnPoint.position;
                 controller.enabled = true;
             }
+        }
 
-
-                
+        if (other.gameObject.CompareTag("Win"))
+        {
+            WinText.gameObject.SetActive(true);
+            FinalScoreText.text = "Final Score: " + score.ToString();
+            FinalCollectibleText.text = "Total Collected: " + collected.ToString() + "/" + collectibleCount.ToString();
         }
     }
 
