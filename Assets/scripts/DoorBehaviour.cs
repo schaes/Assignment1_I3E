@@ -10,9 +10,15 @@ public class DoorBehaviour : MonoBehaviour
 {
     [SerializeField]
     bool willItLock;
+    AudioSource doorAudioSource; // Reference to the AudioSource component
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        doorAudioSource = GetComponent<AudioSource>(); // Get the AudioSource component attached to the door
+    }
     public void Interact()
     {
+        doorAudioSource.Play(); // Play the door sound effect
         Vector3 doorRotation = transform.eulerAngles;
         if (doorRotation.y == 0f)
         {
@@ -33,11 +39,12 @@ public class DoorBehaviour : MonoBehaviour
     {
         Vector3 doorRotation = transform.eulerAngles;
         if (willItLock)
-        { 
+        {
             if (Mathf.Approximately(doorRotation.y, 90f) && Vector3.Distance(transform.position, player.position) > closeDistance)
             {
                 doorRotation.y = 0f; // Reset the door rotation to 0 degrees
                 transform.eulerAngles = doorRotation; // Apply the rotation to the door
+                doorAudioSource.Play(); // Play the door sound effect
             } 
         }
     }

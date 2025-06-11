@@ -10,22 +10,13 @@ public class coinBehaviour : MonoBehaviour
 {
     [SerializeField]
     int value = 10;
-
-    MeshRenderer myMeshRenderer;
     [SerializeField]
-    Material highlightColor;
-    [SerializeField]
-    Material originalColor;
-
-    void Start()
-    {
-        myMeshRenderer = GetComponent<MeshRenderer>();
-        originalColor = myMeshRenderer.material;
-    }
+    AudioClip collectSound; // Sound to play when the coin is collected
 
     public void Collect(PlayerBehaviour player)
     {
         player.ModifyScore(value);
+        AudioSource.PlayClipAtPoint(collectSound, transform.position); // Play the collect sound at the coin's position
         Destroy(gameObject);
     }
 

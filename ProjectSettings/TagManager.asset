@@ -13,6 +13,8 @@ TagManager:
   - LockedDoor
   - spawn
   - Win
+  - gasMask
+  - Poison
   layers:
   - Default
   - TransparentFX

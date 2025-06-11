@@ -15,6 +15,8 @@ public class ImportantObjectBehaviour : MonoBehaviour
     Material highlightColor;
     [SerializeField]
     Material originalColor;
+    [SerializeField]
+    AudioClip collectSound; // Sound to play when the coin is collected
 
     void Start()
     {
@@ -24,7 +26,7 @@ public class ImportantObjectBehaviour : MonoBehaviour
 
     public void Collect(PlayerBehaviour player)
     {
-        player.KeyCollected();
+        AudioSource.PlayClipAtPoint(collectSound, transform.position); // Play the collect sound at the coin's position
         Destroy(gameObject);
     }
 

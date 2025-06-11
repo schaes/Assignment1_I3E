@@ -15,7 +15,7 @@ using System.Collections;
 
 public class PlayerBehaviour : MonoBehaviour
 {
-    public bool Key = false;
+    
     public Transform respawnPoint;
     public GameObject WinText;
     public GameObject NotificationText;
@@ -23,16 +23,25 @@ public class PlayerBehaviour : MonoBehaviour
     int score = 0;
     int playerHealth = 10;
     bool canInteract = false;
+    bool Key = false;
+    bool GasMask = false; // Variable to track if the player has collected the gas mask
+    bool inPoisonGas = false; // Variable to track if the player is in poison gas
     int collected = 0; // Number of collectibles collected
     int collectibleCount;
+    Coroutine poisonGasCoroutine; // Coroutine for poison gas effect
 
     coinBehaviour currentCoin;
     DoorBehaviour currentDoor;
     ImportantObjectBehaviour currentImportantObject;
+    AudioSource achievementAudioSource; // Reference to the AudioSource component
 
     [SerializeField]
+    AudioClip hurtSound; // Sound to play when the coin is collected
+    [SerializeField]
+    AudioClip spawnAudioSource; // Sound to play when the coin is collected
+   
+    [SerializeField]
     Transform spawnPoint;
-
     [SerializeField]
     float InteractionDistance = 5f;
     [SerializeField]
@@ -60,13 +69,7 @@ public class PlayerBehaviour : MonoBehaviour
         scoreText.text = "Score: " + score.ToString();
         healthText.text = "Health: " + playerHealth.ToString();
         collectibleText.text = "Collected: " + collected.ToString() + "/" + collectibleCount.ToString();
-
-    }
-
-    // Call this method to set the player's position to a specific point in the map
-    public void SetPlayerPosition(Vector3 newPosition)
-    {
-        transform.position = newPosition;
+        achievementAudioSource = GetComponent<AudioSource>(); // Get the AudioSource component attached to the door
     }
 
     void Update()
@@ -82,14 +85,22 @@ public class PlayerBehaviour : MonoBehaviour
                 currentImportantObject = hitInfo.collider.GetComponent<ImportantObjectBehaviour>();
                 currentImportantObject.Highlight(); //Highlights the key
                 NotificationText.gameObject.SetActive(true);
-                DescriptionText.text = "Press E to Interact"; 
+                DescriptionText.text = "Press E to pick up the keycard"; 
             }
-            else if (hitInfo.collider.CompareTag("door"))
+            else if (hitInfo.collider.CompareTag("gasMask"))
+            {
+                canInteract = true;
+                currentImportantObject = hitInfo.collider.GetComponent<ImportantObjectBehaviour>();
+                currentImportantObject.Highlight(); //Highlights the mask
+                NotificationText.gameObject.SetActive(true);
+                DescriptionText.text = "Press E to pick up the gas mask"; 
+            }
+            if (hitInfo.collider.CompareTag("door"))
             {
                 canInteract = true;
                 currentDoor = hitInfo.collider.GetComponent<DoorBehaviour>();
                 NotificationText.gameObject.SetActive(true);
-                DescriptionText.text = "Press E to Interact"; 
+                DescriptionText.text = "Press E to Interact";
             }
             else if (hitInfo.collider.CompareTag("LockedDoor"))
             {
@@ -135,6 +146,7 @@ public class PlayerBehaviour : MonoBehaviour
                 {
                     AchievementText.SetActive(true);
                     AchievText.text = "Achievement Unlocked!\nAll Collectibles Collected!";
+                    achievementAudioSource.Play();
                     StartCoroutine(HideAchievementTextAfterDelay(5f)); // Hide after 3 seconds
                 }
             }
@@ -142,43 +154,12 @@ public class PlayerBehaviour : MonoBehaviour
         else if (collision.gameObject.CompareTag("spawn"))
         {
             respawnPoint.position = gameObject.transform.position; //set new respawn point to new spawn point
-            Debug.Log("New respawn point set to: " + respawnPoint.position);
+            
         }
 
         else if (collision.gameObject.CompareTag("hazard"))
         {
-            if (playerHealth > 0)
-            {
-                --playerHealth;
-                healthText.text = "Health: " + playerHealth.ToString();
-
-                if (playerHealth <= 0)
-                {
-                    Debug.Log("Player health reached 0!");
-                    // Reset player health and position
-                    playerHealth = 10;
-                    healthText.text = "Health: " + playerHealth.ToString();
-                    score = score - 10;
-                    scoreText.text = "Score: " + score.ToString();
-                    var controller = GetComponent<CharacterController>();
-                    if (controller != null)
-                    {
-                        controller.enabled = false;
-                        transform.position = respawnPoint.position;
-                        controller.enabled = true;
-                    }
-                }
-            }
-        }
-
-    }
-    void OnTriggerEnter(Collider other)
-    {
-        // Lava logic
-        if (other.gameObject.CompareTag("lava"))
-        {
-            playerHealth = 0; // Set player health to 0 when entering lava
-            Debug.Log("Player entered lava!");
+            playerHealth=0; // Set player health to 0 when entering lava
             playerHealth = 10;
             healthText.text = "Health: " + playerHealth.ToString();
             score = score - 10;
@@ -188,8 +169,36 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 controller.enabled = false;
                 transform.position = respawnPoint.position;
+                AudioSource.PlayClipAtPoint(spawnAudioSource, transform.position); // Play the collect sound at the spawn position
                 controller.enabled = true;
             }
+        }
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        // Lava logic
+        if (other.gameObject.CompareTag("lava"))
+        {
+            playerHealth=0; // Set player health to 0 when entering lava
+            playerHealth = 10;
+            healthText.text = "Health: " + playerHealth.ToString();
+            score = score - 10;
+            scoreText.text = "Score: " + score.ToString();
+            var controller = GetComponent<CharacterController>();
+            if (controller != null)
+            {
+                controller.enabled = false;
+                transform.position = respawnPoint.position;
+                AudioSource.PlayClipAtPoint(spawnAudioSource, transform.position); // Play the collect sound at the spawn position
+                controller.enabled = true;
+            }
+        }
+        //Poison logic
+        if (other.gameObject.CompareTag("Poison") && !GasMask)
+        {
+            inPoisonGas = true;
+            if (poisonGasCoroutine == null)
+                poisonGasCoroutine = StartCoroutine(PoisonDamageOverTime());
         }
 
         if (other.gameObject.CompareTag("Win"))
@@ -198,6 +207,46 @@ public class PlayerBehaviour : MonoBehaviour
             FinalScoreText.text = "Final Score: " + score.ToString();
             FinalCollectibleText.text = "Total Collected: " + collected.ToString() + "/" + collectibleCount.ToString();
         }
+    }
+        void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("Poison"))
+        {
+            inPoisonGas = false;
+            if (poisonGasCoroutine != null)
+            {
+                StopCoroutine(poisonGasCoroutine);
+                poisonGasCoroutine = null;
+            }
+        }
+
+    }
+    IEnumerator PoisonDamageOverTime()
+    {
+        while (inPoisonGas)
+        {
+            playerHealth--;
+            AudioSource.PlayClipAtPoint(hurtSound, transform.position); // Play the collect sound at the coin's position
+            healthText.text = "Health: " + playerHealth.ToString();
+            if (playerHealth <= 0)
+            {
+                playerHealth = 10;
+                healthText.text = "Health: " + playerHealth.ToString();
+                score = score - 10;
+                scoreText.text = "Score: " + score.ToString();
+                var controller = GetComponent<CharacterController>();
+                if (controller != null)
+                {
+                    controller.enabled = false;
+                    transform.position = respawnPoint.position;
+                    AudioSource.PlayClipAtPoint(spawnAudioSource, transform.position); // Play the collect sound at the spawn position
+                    controller.enabled = true;
+                }
+                break;
+            }
+            yield return new WaitForSeconds(1f); // Damage every 1 second
+        }
+        poisonGasCoroutine = null;
     }
 
     IEnumerator HideAchievementTextAfterDelay(float delay) // Coroutine to hide achievement text after a delay
@@ -210,12 +259,6 @@ public class PlayerBehaviour : MonoBehaviour
         score += amount;
         scoreText.text = "Score: " + score.ToString();
     }
-    public void KeyCollected()
-    {
-        Key = true;
-        Debug.Log("Key collected!");
-    }
-
     void OnInteract()
     {
         // Handle interaction logic here
@@ -244,14 +287,18 @@ public class PlayerBehaviour : MonoBehaviour
                 }
 
             }
-            else if (currentCoin != null)
-            {
-                Debug.Log("Player interacted with a coin!");
-                currentCoin.Collect(this);
-                currentCoin = null; // Reset current coin after collection
-            }
             else if (currentImportantObject != null)
             {
+                if (currentImportantObject.tag == "Key")
+                {
+                    Key = true;
+                    Debug.Log("Player collected a key!");
+                }
+                else if (currentImportantObject.tag == "gasMask")
+                {
+                    GasMask = true; 
+                    Debug.Log("Player collected a gas mask!");
+                }
                 Debug.Log("Player interacted with an important object!");
                 currentImportantObject.Collect(this);
                 currentImportantObject.Unhighlight(); // Unhighlight the key after collection
@@ -265,15 +312,5 @@ public class PlayerBehaviour : MonoBehaviour
         }
 
     }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Collectible"))
-        {
-            currentCoin = null;
-            canInteract = false;
-        }
-    }
-
 
 }

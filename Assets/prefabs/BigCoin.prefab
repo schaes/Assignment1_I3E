@@ -34114,8 +34114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   value: 50
-  highlightColor: {fileID: 0}
-  originalColor: {fileID: 0}
+  collectSound: {fileID: 8300000, guid: b0b0545e3dbc65844bb9846ac6d2e13c, type: 3}
 --- !u!135 &3792998022650390053
 SphereCollider:
   m_ObjectHideFlags: 0
