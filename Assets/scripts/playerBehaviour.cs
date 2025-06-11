@@ -1,9 +1,17 @@
+/*
+* Author: Emilie Tee Jing Hui
+* Date: 11/6/2025
+* Description: PlayerBehaviour script that handles the player's interactions, health, score, and collectibles in the game.
+*/
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.UI;
 using StarterAssets;
 using UnityEngine.ProBuilder.Shapes;
+using UnityEngine.SocialPlatforms.Impl;
+using System.Collections;
 
 public class PlayerBehaviour : MonoBehaviour
 {
@@ -11,6 +19,7 @@ public class PlayerBehaviour : MonoBehaviour
     public Transform respawnPoint;
     public GameObject WinText;
     public GameObject NotificationText;
+    public GameObject AchievementText;
     int score = 0;
     int playerHealth = 10;
     bool canInteract = false;
@@ -38,10 +47,13 @@ public class PlayerBehaviour : MonoBehaviour
     TextMeshProUGUI FinalCollectibleText;
     [SerializeField]
     TextMeshProUGUI DescriptionText;
+    [SerializeField]
+    TextMeshProUGUI AchievText;
 
 
     void Start()
     {
+        AchievementText.gameObject.SetActive(false);
         WinText.gameObject.SetActive(false);
         NotificationText.gameObject.SetActive(false);
         collectibleCount = GameObject.FindGameObjectsWithTag("Collectible").Length;
@@ -119,6 +131,12 @@ public class PlayerBehaviour : MonoBehaviour
                 currentCoin = null; // Reset current coin after collection
                 collected++;
                 collectibleText.text = "Collected: " + collected.ToString() + "/" + collectibleCount.ToString();
+                if (collected >= collectibleCount)
+                {
+                    AchievementText.SetActive(true);
+                    AchievText.text = "Achievement Unlocked!\nAll Collectibles Collected!";
+                    StartCoroutine(HideAchievementTextAfterDelay(5f)); // Hide after 3 seconds
+                }
             }
         }
         else if (collision.gameObject.CompareTag("spawn"))
@@ -182,7 +200,11 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
-
+    IEnumerator HideAchievementTextAfterDelay(float delay) // Coroutine to hide achievement text after a delay
+    {
+        yield return new WaitForSeconds(delay); // Wait for 'delay' seconds
+        AchievementText.SetActive(false); // Hide the achievement text
+    }
     public void ModifyScore(int amount)
     {
         score += amount;
@@ -213,7 +235,6 @@ public class PlayerBehaviour : MonoBehaviour
                     {
                         Debug.Log("Player interacted with a locked door!");
                         currentDoor.Interact();
-                        Key = false; // Reset key after using it
                         currentDoor = null;
                     }
                     else

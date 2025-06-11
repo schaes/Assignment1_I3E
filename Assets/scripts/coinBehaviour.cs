@@ -1,3 +1,8 @@
+/*
+* Author: Emilie Tee Jing Hui
+* Date: 11/6/2025
+* Description: Coin behaviour script that handles the coin's collection and rotation.
+*/
 using Unity.VisualScripting;
 using UnityEngine;
 

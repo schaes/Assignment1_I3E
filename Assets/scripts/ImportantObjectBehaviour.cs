@@ -1,3 +1,8 @@
+/*
+* Author: Emilie Tee Jing Hui
+* Date: 11/6/2025
+* Description: ImportantObjectBehaviour script that handles the collection and highlighting of important objects in the game.
+*/
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;

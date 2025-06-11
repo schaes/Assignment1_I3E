@@ -1,3 +1,8 @@
+/*
+* Author: Emilie Tee Jing Hui
+* Date: 11/6/2025
+* Description: Door behaviour script that handles the door's interaction and locking mechanism.
+*/
 using System.Data.Common;
 using UnityEngine;
 
