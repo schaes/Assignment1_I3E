@@ -1,14 +1,13 @@
-
-#Controls
+# Controls
 - W, A, S, D for movement 
 - E to interact with objects (e.g.: doors, card, gasmask) 
 - move mouse to look around 
-#Minimum System Requirements
-#Operating System:
+# Minimum System Requirements
+# Operating System
 -	Windows 7 SP1+, Windows 10, or newer
 -	64-bit OS highly recommended (Unity builds can be 32-bit or 64-bit depending on your build target)
 
-#Component	Minimum Requirement
+# Component	Minimum Requirement
 CPU	> Intel Core i3 (2nd gen or newer) or AMD equivalent
 RAM	> 4 GB
 GPU	> Integrated graphics (Intel HD 4000 or newer) or low-end dedicated GPU
@@ -17,14 +16,14 @@ DirectX >	DirectX 11 or higher
 Display >	1280×720 resolution minimum (16:9 resolution)
 .NET > .NET Framework 4.x (Unity handles this if included in build)
 
-#Bugs
+# Bugs
 -	UI when collecting keycard or gasmask doesn’t go away when collected
   
-#Note
+# Note
 - There are no complicated puzzles however should you get stuck on certain jumps please do note that you are supposed to push the dark grey blocks to allow you to make the jumps that are impossible. 
 - Also, for the room with the poisonous gas you need to collect the gas mask to not take damage from in the gas
 
-#Credits and References
+# Credits and References
 references for code 
 -	Object Spin Code https://youtu.be/dlCxPHFujzg?si=Np8h6FuLBcjPxBEA 
 -	Copilot AI
