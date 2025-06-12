@@ -24,10 +24,10 @@ Display >	1280×720 resolution minimum (16:9 resolution)
 - Also, for the room with the poisonous gas you need to collect the gas mask to not take damage from in the gas
 
 # Credits and References
-references for code 
+# references for code 
 -	Object Spin Code https://youtu.be/dlCxPHFujzg?si=Np8h6FuLBcjPxBEA 
 -	Copilot AI
-Sound Used In-Game
+# Sound Used In-Game
 -	Hurt SFX https://www.myinstants.com/en/instant/roblox-death-sound-effect-2459/?utm_source=copy&utm_medium=share 
 -	Yay SFX https://www.myinstants.com/en/instant/yay-roblox-27467/?utm_source=copy&utm_medium=share 
 -	Door SFX https://www.myinstants.com/en/instant/door-open-sound-effect-8564/?utm_source=copy&utm_medium=share 
