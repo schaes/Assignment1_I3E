@@ -33,10 +33,18 @@ public class ImportantObjectBehaviour : MonoBehaviour
     public void Highlight()
     {
         myMeshRenderer.material = highlightColor;
+        foreach (var renderer in GetComponentsInChildren<MeshRenderer>())
+        {
+            renderer.material = highlightColor;
+        }
     }
     public void Unhighlight()
     {
         myMeshRenderer.material = originalColor;
+            foreach (var renderer in GetComponentsInChildren<MeshRenderer>())
+        {
+            renderer.material = originalColor;
+        }
     }
 
     void Update()
