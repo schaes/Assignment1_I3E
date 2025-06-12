@@ -29,17 +29,15 @@ public class PlayerBehaviour : MonoBehaviour
     int collected = 0; // Number of collectibles collected
     int collectibleCount;
     Coroutine poisonGasCoroutine; // Coroutine for poison gas effect
-
     coinBehaviour currentCoin;
     DoorBehaviour currentDoor;
     ImportantObjectBehaviour currentImportantObject;
     AudioSource achievementAudioSource; // Reference to the AudioSource component
 
     [SerializeField]
-    AudioClip hurtSound; // Sound to play when the coin is collected
+    AudioClip hurtSound;
     [SerializeField]
-    AudioClip spawnAudioSource; // Sound to play when the coin is collected
-   
+    AudioClip spawnAudioSource; 
     [SerializeField]
     Transform spawnPoint;
     [SerializeField]
@@ -75,7 +73,7 @@ public class PlayerBehaviour : MonoBehaviour
     void Update()
     {
         RaycastHit hitInfo;
-        Debug.DrawRay(spawnPoint.position, spawnPoint.forward * InteractionDistance, Color.red);
+        //Debug.DrawRay(spawnPoint.position, spawnPoint.forward * InteractionDistance, Color.red);
 
         if (Physics.Raycast(spawnPoint.position, spawnPoint.forward, out hitInfo, InteractionDistance))
         {
@@ -145,7 +143,7 @@ public class PlayerBehaviour : MonoBehaviour
                     AchievementText.SetActive(true);
                     AchievText.text = "Achievement Unlocked!\nAll Collectibles Collected!";
                     achievementAudioSource.Play();
-                    StartCoroutine(HideAchievementTextAfterDelay(5f)); // Hide after 3 seconds
+                    StartCoroutine(HideAchievementTextAfterDelay(5f)); // Hide after 5 seconds
                 }
             }
         }
