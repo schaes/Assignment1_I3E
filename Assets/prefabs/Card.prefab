@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 3138259526091292320}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.128274, y: 1.444, z: -1.0834346}
+  m_LocalPosition: {x: -3.3194487, y: 37.322, z: -26.98523}
   m_LocalScale: {x: 0.5808485, y: 0.35476, z: 0.026080891}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -123,3 +123,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   highlightColor: {fileID: 2100000, guid: 3f6554e5ac3dac545a418144ba3fe2f7, type: 2}
   originalColor: {fileID: 2100000, guid: 6dd58edd6b6c88e488270f8e388d5aed, type: 2}
+  collectSound: {fileID: 8300000, guid: 9858cfc21ea09f443bb3cfed2427667b, type: 3}
+  notificationUI: {fileID: 0}

@@ -108,9 +108,7 @@ public class PlayerBehaviour : MonoBehaviour
                 currentDoor = hitInfo.collider.GetComponent<DoorBehaviour>();
                 NotificationText.gameObject.SetActive(true);
                 if (Key)
-                {
                     DescriptionText.text = "Press E to unlock";
-                }
                 else
                     DescriptionText.text = "This door is Locked!";
             }
@@ -152,10 +150,7 @@ public class PlayerBehaviour : MonoBehaviour
             }
         }
         else if (collision.gameObject.CompareTag("spawn"))
-        {
             respawnPoint.position = gameObject.transform.position; //set new respawn point to new spawn point
-            
-        }
 
         else if (collision.gameObject.CompareTag("hazard"))
         {
@@ -261,14 +256,14 @@ public class PlayerBehaviour : MonoBehaviour
     }
     void OnInteract()
     {
-        // Handle interaction logic here
+        // Interaction logic here
         if (canInteract)
         {
             if (currentDoor != null)
             {
                 if (currentDoor.tag == "door")
                 {
-                    Debug.Log("Player interacted with a door!");
+                    //Debug.Log("Player interacted with a door!");
                     currentDoor.Interact();
                     currentDoor = null;
                 }
@@ -276,13 +271,9 @@ public class PlayerBehaviour : MonoBehaviour
                 {
                     if (Key)
                     {
-                        Debug.Log("Player interacted with a locked door!");
+                        //Debug.Log("Player interacted with a locked door!");
                         currentDoor.Interact();
                         currentDoor = null;
-                    }
-                    else
-                    {
-                        Debug.Log("This door is locked!");
                     }
                 }
 
@@ -290,27 +281,19 @@ public class PlayerBehaviour : MonoBehaviour
             else if (currentImportantObject != null)
             {
                 if (currentImportantObject.tag == "Key")
-                {
                     Key = true;
-                    Debug.Log("Player collected a key!");
-                }
+                //Debug.Log("Player collected a key!");
                 else if (currentImportantObject.tag == "gasMask")
-                {
-                    GasMask = true; 
-                    Debug.Log("Player collected a gas mask!");
-                }
-                Debug.Log("Player interacted with an important object!");
+                    GasMask = true;
+                //Debug.Log("Player collected a gas mask!");
+                //Debug.Log("Player interacted with an important object!");
                 currentImportantObject.Collect(this);
                 currentImportantObject.Unhighlight(); // Unhighlight the key after collection
                 currentImportantObject = null; // Reset current important object after collection
+                NotificationText.gameObject.SetActive(false);
+                
             }
 
         }
-        else
-        {
-            Debug.Log("Nothing to interact with!");
-        }
-
     }
-
 }
