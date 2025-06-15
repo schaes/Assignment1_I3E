@@ -40,7 +40,7 @@ public class DoorBehaviour : MonoBehaviour
         Vector3 doorRotation = transform.eulerAngles;
         if (willItLock)
         {
-            if (Mathf.Approximately(doorRotation.y, 90f) && Vector3.Distance(transform.position, player.position) > closeDistance)
+            if (Mathf.Approximately(doorRotation.y, 90f) && Vector3.Distance(transform.position, player.position) > closeDistance) // checks if door is open and player is far away
             {
                 doorRotation.y = 0f; // Reset the door rotation to 0 degrees
                 transform.eulerAngles = doorRotation; // Apply the rotation to the door

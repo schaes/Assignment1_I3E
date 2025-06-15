@@ -30,7 +30,7 @@ public class ImportantObjectBehaviour : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void Highlight()
+    public void Highlight() // Highlights the object by changing its material to the highlight color
     {
         myMeshRenderer.material = highlightColor;
         foreach (var renderer in GetComponentsInChildren<MeshRenderer>())
@@ -38,7 +38,7 @@ public class ImportantObjectBehaviour : MonoBehaviour
             renderer.material = highlightColor;
         }
     }
-    public void Unhighlight()
+    public void Unhighlight() // Unhighlights the object by changing its material back to the original color
     {
         myMeshRenderer.material = originalColor;
             foreach (var renderer in GetComponentsInChildren<MeshRenderer>())
@@ -47,7 +47,7 @@ public class ImportantObjectBehaviour : MonoBehaviour
         }
     }
 
-    void Update()
+    void Update() // to rotate the important object continuously
     {
         this.transform.Rotate(Vector3.up, 100 * Time.deltaTime, Space.World);
     }

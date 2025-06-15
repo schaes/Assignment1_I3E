@@ -73,11 +73,9 @@ public class PlayerBehaviour : MonoBehaviour
     void Update()
     {
         RaycastHit hitInfo;
-        //Debug.DrawRay(spawnPoint.position, spawnPoint.forward * InteractionDistance, Color.red);
-
         if (Physics.Raycast(spawnPoint.position, spawnPoint.forward, out hitInfo, InteractionDistance))
         {
-            if (hitInfo.collider.CompareTag("Key"))
+            if (hitInfo.collider.CompareTag("Key")) /// Checks if object hit tag is key
             {
                 canInteract = true;
                 currentImportantObject = hitInfo.collider.GetComponent<ImportantObjectBehaviour>();
@@ -85,7 +83,7 @@ public class PlayerBehaviour : MonoBehaviour
                 NotificationText.gameObject.SetActive(true);
                 DescriptionText.text = "Press E to pick up the keycard"; 
             }
-            else if (hitInfo.collider.CompareTag("gasMask"))
+            else if (hitInfo.collider.CompareTag("gasMask")) /// Checks if object hit tag is gasMask
             {
                 canInteract = true;
                 currentImportantObject = hitInfo.collider.GetComponent<ImportantObjectBehaviour>();
@@ -93,31 +91,38 @@ public class PlayerBehaviour : MonoBehaviour
                 NotificationText.gameObject.SetActive(true);
                 DescriptionText.text = "Press E to pick up the gas mask"; 
             }
-            if (hitInfo.collider.CompareTag("door"))
+            if (hitInfo.collider.CompareTag("door")) /// Checks if object hit tag is door
             {
                 canInteract = true;
                 currentDoor = hitInfo.collider.GetComponent<DoorBehaviour>();
                 NotificationText.gameObject.SetActive(true);
                 DescriptionText.text = "Press E to Interact";
             }
-            else if (hitInfo.collider.CompareTag("LockedDoor"))
+            else if (hitInfo.collider.CompareTag("LockedDoor")) /// Checks if object hit tag is LockedDoor
             {
                 canInteract = true;
                 currentDoor = hitInfo.collider.GetComponent<DoorBehaviour>();
                 NotificationText.gameObject.SetActive(true);
-                if (Key)
+                if (Key) /// Checks if player has key to unlock the door
                     DescriptionText.text = "Press E to unlock";
                 else
                     DescriptionText.text = "This door is Locked!";
             }
         }
-        else if (currentDoor != null)
+        else if (currentDoor != null) // makes it so that you can only interact with the door if you are in range
         {
-            currentDoor = null;
+            currentDoor = null; // Reset current door after interaction
             canInteract = false;
             NotificationText.gameObject.SetActive(false);
         }
-        else if (currentImportantObject != null)
+        else if (currentImportantObject != null) // makes it so that you can only interact with the key if you are in range
+        {
+            currentImportantObject.Unhighlight(); // Unhighlight the key if not in range
+            currentImportantObject = null; // Reset current important object after interaction
+            canInteract = false;
+            NotificationText.gameObject.SetActive(false);
+        }
+        else if (currentImportantObject != null) // makes it so that you can only interact with the key/gasmask if you are in range
         {
             currentImportantObject.Unhighlight(); // Unhighlight the key if not in range
             currentImportantObject = null;
@@ -131,14 +136,14 @@ public class PlayerBehaviour : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Collectible"))
         {
-            currentCoin = collision.gameObject.GetComponent<coinBehaviour>();
+            currentCoin = collision.gameObject.GetComponent<coinBehaviour>(); // Get the coinBehaviour component from the collided object
             if (currentCoin != null)
             {
                 currentCoin.Collect(this);
                 currentCoin = null; // Reset current coin after collection
                 collected++;
-                collectibleText.text = "Collected: " + collected.ToString() + "/" + collectibleCount.ToString();
-                if (collected >= collectibleCount)
+                collectibleText.text = "Collected: " + collected.ToString() + "/" + collectibleCount.ToString(); // Update the collectible text
+                if (collected >= collectibleCount) // Check if all collectibles have been collected and awards achievement upon reaching the required amount
                 {
                     AchievementText.SetActive(true);
                     AchievText.text = "Achievement Unlocked!\nAll Collectibles Collected!";
@@ -147,17 +152,18 @@ public class PlayerBehaviour : MonoBehaviour
                 }
             }
         }
-        else if (collision.gameObject.CompareTag("spawn"))
+        else if (collision.gameObject.CompareTag("spawn")) // Checks if object hit tag is spawn
             respawnPoint.position = gameObject.transform.position; //set new respawn point to new spawn point
 
-        else if (collision.gameObject.CompareTag("hazard"))
+        else if (collision.gameObject.CompareTag("hazard")) // Checks if object hit tag is hazard
         {
-            playerHealth=0; // Set player health to 0 when entering lava
-            playerHealth = 10;
-            healthText.text = "Health: " + playerHealth.ToString();
-            score = score - 10;
+            //respawn stuff below because player collided with hazard and instantly dies upon collision
+            playerHealth = 10; // to reset health to full upon respawn
+            healthText.text = "Health: " + playerHealth.ToString(); // Update health text when player collides with hazard
+            score = score - 10; // penalty for dying
             scoreText.text = "Score: " + score.ToString();
             var controller = GetComponent<CharacterController>();
+            // Disable the character controller to prevent movement during respawn because if player moves when respawning the code might not teleport the player to the respawn point
             if (controller != null)
             {
                 controller.enabled = false;
@@ -172,10 +178,10 @@ public class PlayerBehaviour : MonoBehaviour
         // Lava logic
         if (other.gameObject.CompareTag("lava"))
         {
-            playerHealth=0; // Set player health to 0 when entering lava
-            playerHealth = 10;
+            // instant death code, same as hazard collision code
+            playerHealth = 10; // to reset health to full upon respawn
             healthText.text = "Health: " + playerHealth.ToString();
-            score = score - 10;
+            score = score - 10; //death penalty
             scoreText.text = "Score: " + score.ToString();
             var controller = GetComponent<CharacterController>();
             if (controller != null)
@@ -186,22 +192,22 @@ public class PlayerBehaviour : MonoBehaviour
                 controller.enabled = true;
             }
         }
-        //Poison logic
+        //Poison logic which is different from lava and hazard because it does damage over time
         if (other.gameObject.CompareTag("Poison") && !GasMask)
         {
             inPoisonGas = true;
             if (poisonGasCoroutine == null)
-                poisonGasCoroutine = StartCoroutine(PoisonDamageOverTime());
+                poisonGasCoroutine = StartCoroutine(PoisonDamageOverTime()); // Start the coroutine for poison damage over time (corountine code at line 223)
         }
 
-        if (other.gameObject.CompareTag("Win"))
+        if (other.gameObject.CompareTag("Win")) //when player enters the win trigger
         {
-            WinText.gameObject.SetActive(true);
+            WinText.gameObject.SetActive(true); //pulls up win screen
             FinalScoreText.text = "Final Score: " + score.ToString();
             FinalCollectibleText.text = "Total Collected: " + collected.ToString() + "/" + collectibleCount.ToString();
         }
     }
-        void OnTriggerExit(Collider other)
+        void OnTriggerExit(Collider other) // to stop the poison gas damage when player exits the poison gas trigger
     {
         if (other.gameObject.CompareTag("Poison"))
         {
@@ -214,14 +220,14 @@ public class PlayerBehaviour : MonoBehaviour
         }
 
     }
-    IEnumerator PoisonDamageOverTime()
+    IEnumerator PoisonDamageOverTime() // Coroutine to handle poison gas damage over time
     {
         while (inPoisonGas)
         {
             playerHealth--;
             AudioSource.PlayClipAtPoint(hurtSound, transform.position); // Play the collect sound at the coin's position
             healthText.text = "Health: " + playerHealth.ToString();
-            if (playerHealth <= 0)
+            if (playerHealth <= 0) // If player health reaches 0, respawn the player
             {
                 playerHealth = 10;
                 healthText.text = "Health: " + playerHealth.ToString();
@@ -247,18 +253,19 @@ public class PlayerBehaviour : MonoBehaviour
         yield return new WaitForSeconds(delay); // Wait for 'delay' seconds
         AchievementText.SetActive(false); // Hide the achievement text
     }
-    public void ModifyScore(int amount)
+    public void ModifyScore(int amount) // Method to modify the player's score
     {
         score += amount;
         scoreText.text = "Score: " + score.ToString();
     }
-    void OnInteract()
+    void OnInteract() // Method to handle player interaction with doors and important objects
     {
         // Interaction logic here
         if (canInteract)
         {
-            if (currentDoor != null)
+            if (currentDoor != null) // Checks if the player is interacting with a door
             {
+                // Checks if the door is a regular door or locked door
                 if (currentDoor.tag == "door")
                 {
                     //Debug.Log("Player interacted with a door!");
@@ -267,9 +274,8 @@ public class PlayerBehaviour : MonoBehaviour
                 }
                 else if (currentDoor.tag == "LockedDoor")
                 {
-                    if (Key)
+                    if (Key) //checks if player has key to unlock door
                     {
-                        //Debug.Log("Player interacted with a locked door!");
                         currentDoor.Interact();
                         currentDoor = null;
                     }
@@ -278,13 +284,12 @@ public class PlayerBehaviour : MonoBehaviour
             }
             else if (currentImportantObject != null)
             {
+                // checks which important object the player is interacting with
                 if (currentImportantObject.tag == "Key")
                     Key = true;
-                //Debug.Log("Player collected a key!");
                 else if (currentImportantObject.tag == "gasMask")
                     GasMask = true;
-                //Debug.Log("Player collected a gas mask!");
-                //Debug.Log("Player interacted with an important object!");
+
                 currentImportantObject.Collect(this);
                 currentImportantObject.Unhighlight(); // Unhighlight the key after collection
                 currentImportantObject = null; // Reset current important object after collection
